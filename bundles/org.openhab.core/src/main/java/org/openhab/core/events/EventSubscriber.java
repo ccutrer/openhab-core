@@ -33,6 +33,15 @@ public interface EventSubscriber {
     public static String ALL_EVENT_TYPES = "ALL";
 
     /**
+     * The OSGi service property key to set if you would like to automatically
+     * filter events by topic.
+     * 
+     * Topics are processed as filesystem globs, as documented at
+     * https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)
+     */
+    public static String EVENT_TOPICS_PROPERTY = "event.topics";
+
+    /**
      * Gets the event types to which the event subscriber is subscribed to.
      *
      * @return subscribed event types (not null)
@@ -45,8 +54,9 @@ public interface EventSubscriber {
      *
      * @return the event filter, or null
      */
-    @Nullable
-    EventFilter getEventFilter();
+    default @Nullable EventFilter getEventFilter() {
+        return null;
+    }
 
     /**
      * Callback method for receiving {@link Event}s from the openHAB event bus. This method is called for

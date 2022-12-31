@@ -13,6 +13,7 @@
 package org.openhab.core.internal.events;
 
 import java.io.Closeable;
+import java.nio.file.PathMatcher;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -51,9 +52,11 @@ public class ThreadedEventHandler implements Closeable {
      * @param typedEventFactories the event factories indexed by the event type
      */
     ThreadedEventHandler(Map<String, Set<EventSubscriber>> typedEventSubscribers,
-            final Map<String, EventFactory> typedEventFactories) {
+            final Map<String, EventFactory> typedEventFactories,
+            final Map<EventSubscriber, PathMatcher> eventSubscriberTopicFilters) {
         thread = new Thread(() -> {
-            try (EventHandler worker = new EventHandler(typedEventSubscribers, typedEventFactories)) {
+            try (EventHandler worker = new EventHandler(typedEventSubscribers, typedEventFactories,
+                    eventSubscriberTopicFilters)) {
                 while (running.get()) {
                     try {
                         logger.trace("wait for event");

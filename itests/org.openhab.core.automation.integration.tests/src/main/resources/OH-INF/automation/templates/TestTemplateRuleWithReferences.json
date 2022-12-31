@@ -29,8 +29,7 @@
 				"id": "ItemStateChangeTriggerID",
 				"type": "core.GenericEventTrigger",
 				"configuration": {
-					"eventSource": "{{triggerItem}}",
-					"eventTopic": "openhab/items/*",
+					"eventTopic": "openhab/items/{{triggerItem}}/state",
 					"eventTypes": "ItemStateEvent"
 				}
 			}

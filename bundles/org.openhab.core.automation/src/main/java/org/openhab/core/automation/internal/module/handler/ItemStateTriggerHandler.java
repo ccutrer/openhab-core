@@ -25,7 +25,6 @@ import org.openhab.core.automation.Trigger;
 import org.openhab.core.automation.handler.BaseTriggerModuleHandler;
 import org.openhab.core.automation.handler.TriggerHandlerCallback;
 import org.openhab.core.events.Event;
-import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventSubscriber;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.events.GroupItemStateChangedEvent;
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author Simon Merschjohann - Initial contribution
  */
 @NonNullByDefault
-public class ItemStateTriggerHandler extends BaseTriggerModuleHandler implements EventSubscriber, EventFilter {
+public class ItemStateTriggerHandler extends BaseTriggerModuleHandler implements EventSubscriber {
 
     public static final String UPDATE_MODULE_TYPE_ID = "core.ItemStateUpdateTrigger";
     public static final String CHANGE_MODULE_TYPE_ID = "core.ItemStateChangeTrigger";
@@ -83,7 +82,7 @@ public class ItemStateTriggerHandler extends BaseTriggerModuleHandler implements
         }
         this.bundleContext = bundleContext;
         Dictionary<String, Object> properties = new Hashtable<>();
-        properties.put("event.topics", "openhab/items/" + itemName + "/*");
+        properties.put(EventSubscriber.EVENT_TOPICS_PROPERTY, "openhab/items/" + itemName + "/**");
         eventSubscriberRegistration = this.bundleContext.registerService(EventSubscriber.class.getName(), this,
                 properties);
 
@@ -96,11 +95,6 @@ public class ItemStateTriggerHandler extends BaseTriggerModuleHandler implements
     @Override
     public Set<String> getSubscribedEventTypes() {
         return types;
-    }
-
-    @Override
-    public @Nullable EventFilter getEventFilter() {
-        return this;
     }
 
     @Override
@@ -165,11 +159,5 @@ public class ItemStateTriggerHandler extends BaseTriggerModuleHandler implements
             eventSubscriberRegistration.unregister();
             eventSubscriberRegistration = null;
         }
-    }
-
-    @Override
-    public boolean apply(Event event) {
-        logger.trace("->FILTER: {}:{}", event.getTopic(), itemName);
-        return event.getTopic().contains("openhab/items/" + itemName + "/");
     }
 }

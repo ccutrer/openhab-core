@@ -44,7 +44,6 @@ import org.openhab.core.automation.type.TriggerType;
 import org.openhab.core.common.registry.ProviderChangeListener;
 import org.openhab.core.config.core.ConfigDescriptionParameter;
 import org.openhab.core.events.Event;
-import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.events.EventSubscriber;
 import org.openhab.core.items.Item;
@@ -122,11 +121,6 @@ public class AutomationIntegrationJsonTest extends JavaOSGiTest {
             @Override
             public Set<String> getSubscribedEventTypes() {
                 return Set.of(RuleStatusInfoEvent.TYPE);
-            }
-
-            @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
             }
 
             @Override
@@ -253,8 +247,8 @@ public class AutomationIntegrationJsonTest extends JavaOSGiTest {
                 .filter(t -> "ItemStateChangeTriggerID".equals(t.getId())).findFirst();
         assertThat(trigger.isPresent(), is(true));
         assertThat(trigger.get().getTypeUID(), is("core.GenericEventTrigger"));
-        assertThat(trigger.get().getConfiguration().get("eventSource"), is("myMotionItem"));
-        assertThat(trigger.get().getConfiguration().get("eventTopic"), is("openhab/items/*"));
+        assertThat(trigger.get().getConfiguration().get("eventSource"), is(""));
+        assertThat(trigger.get().getConfiguration().get("eventTopic"), is("openhab/items/myMotionItem/state"));
         assertThat(trigger.get().getConfiguration().get("eventTypes"), is("ItemStateEvent"));
         Optional<? extends Action> action = rule.getActions().stream()
                 .filter(a -> "ItemPostCommandActionID".equals(a.getId())).findFirst();
@@ -293,7 +287,8 @@ public class AutomationIntegrationJsonTest extends JavaOSGiTest {
                 .filter(t -> "ItemStateChangeTriggerID".equals(t.getId())).findFirst();
         assertThat(trigger.isPresent(), is(true));
         assertThat(trigger.get().getTypeUID(), is("core.GenericEventTrigger"));
-        assertThat(trigger.get().getConfiguration().get("eventTopic"), is("openhab/items/*"));
+        assertThat(trigger.get().getConfiguration().get("eventSource"), is(""));
+        assertThat(trigger.get().getConfiguration().get("eventTopic"), is("openhab/items/myMotionItem/state"));
         assertThat(trigger.get().getConfiguration().get("eventTypes"), is("ItemStateEvent"));
         Optional<? extends Action> action = rule.getActions().stream()
                 .filter(a -> "ItemPostCommandActionID".equals(a.getId())).findFirst();
@@ -311,11 +306,6 @@ public class AutomationIntegrationJsonTest extends JavaOSGiTest {
             @Override
             public Set<String> getSubscribedEventTypes() {
                 return Set.of(ItemCommandEvent.TYPE);
-            }
-
-            @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
             }
 
             @Override
@@ -361,11 +351,6 @@ public class AutomationIntegrationJsonTest extends JavaOSGiTest {
             @Override
             public Set<String> getSubscribedEventTypes() {
                 return Set.of(ItemCommandEvent.TYPE);
-            }
-
-            @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
             }
 
             @Override

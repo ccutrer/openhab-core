@@ -24,7 +24,6 @@ import org.openhab.core.automation.Trigger;
 import org.openhab.core.automation.handler.BaseTriggerModuleHandler;
 import org.openhab.core.automation.handler.TriggerHandlerCallback;
 import org.openhab.core.events.Event;
-import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventSubscriber;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemRegistry;
@@ -47,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author Kai Kreuzer - Initial contribution
  */
 @NonNullByDefault
-public class GroupStateTriggerHandler extends BaseTriggerModuleHandler implements EventSubscriber, EventFilter {
+public class GroupStateTriggerHandler extends BaseTriggerModuleHandler implements EventSubscriber {
 
     public static final String UPDATE_MODULE_TYPE_ID = "core.GroupStateUpdateTrigger";
     public static final String CHANGE_MODULE_TYPE_ID = "core.GroupStateChangeTrigger";
@@ -84,7 +83,7 @@ public class GroupStateTriggerHandler extends BaseTriggerModuleHandler implement
         this.ruleUID = ruleUID;
         this.itemRegistry = itemRegistry;
         Dictionary<String, Object> properties = new Hashtable<>();
-        properties.put("event.topics", "openhab/items/*");
+        properties.put(EventSubscriber.EVENT_TOPICS_PROPERTY, "openhab/items/**");
         eventSubscriberRegistration = this.bundleContext.registerService(EventSubscriber.class.getName(), this,
                 properties);
 
@@ -97,11 +96,6 @@ public class GroupStateTriggerHandler extends BaseTriggerModuleHandler implement
     @Override
     public Set<String> getSubscribedEventTypes() {
         return types;
-    }
-
-    @Override
-    public @Nullable EventFilter getEventFilter() {
-        return this;
     }
 
     @Override
@@ -175,11 +169,5 @@ public class GroupStateTriggerHandler extends BaseTriggerModuleHandler implement
     public void dispose() {
         super.dispose();
         eventSubscriberRegistration.unregister();
-    }
-
-    @Override
-    public boolean apply(Event event) {
-        logger.trace("->FILTER: {}:{}", event.getTopic(), groupName);
-        return event.getTopic().startsWith("openhab/items/");
     }
 }

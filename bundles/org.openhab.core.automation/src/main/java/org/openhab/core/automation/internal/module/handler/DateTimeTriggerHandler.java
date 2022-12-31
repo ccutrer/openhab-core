@@ -27,7 +27,6 @@ import org.openhab.core.automation.handler.TimeBasedTriggerHandler;
 import org.openhab.core.automation.handler.TriggerHandlerCallback;
 import org.openhab.core.config.core.ConfigParser;
 import org.openhab.core.events.Event;
-import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventSubscriber;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
@@ -54,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public class DateTimeTriggerHandler extends BaseTriggerModuleHandler
-        implements SchedulerRunnable, TimeBasedTriggerHandler, EventSubscriber, EventFilter {
+        implements SchedulerRunnable, TimeBasedTriggerHandler, EventSubscriber {
 
     public static final String MODULE_TYPE_ID = "timer.DateTimeTrigger";
     public static final String CONFIG_ITEM_NAME = "itemName";
@@ -85,7 +84,7 @@ public class DateTimeTriggerHandler extends BaseTriggerModuleHandler
         this.timeOnly = ConfigParser.valueAsOrElse(module.getConfiguration().get(CONFIG_TIME_ONLY), Boolean.class,
                 false);
         Dictionary<String, Object> properties = new Hashtable<>();
-        properties.put("event.topics", "openhab/items/" + itemName + "/*");
+        properties.put(EventSubscriber.EVENT_TOPICS_PROPERTY, "openhab/items/" + itemName + "/{state,command}");
         eventSubscriberRegistration = bundleContext.registerService(EventSubscriber.class.getName(), this, properties);
         try {
             process(itemRegistry.getItem(itemName).getState());
@@ -133,11 +132,6 @@ public class DateTimeTriggerHandler extends BaseTriggerModuleHandler
     }
 
     @Override
-    public @Nullable EventFilter getEventFilter() {
-        return this;
-    }
-
-    @Override
     public void receive(Event event) {
         if (event instanceof ItemEvent && (((ItemEvent) event).getItemName().equals(itemName))) {
             if (event instanceof ItemStateEvent) {
@@ -148,12 +142,6 @@ public class DateTimeTriggerHandler extends BaseTriggerModuleHandler
                 logger.debug("Don't know how to process event {}, discarding", event);
             }
         }
-    }
-
-    @Override
-    public boolean apply(Event event) {
-        logger.trace("->FILTER: {}:{}", event.getTopic(), itemName);
-        return event.getTopic().contains("openhab/items/" + itemName + "/");
     }
 
     private synchronized void startScheduler() {

@@ -12,6 +12,8 @@
  */
 package org.openhab.core.internal.events;
 
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,6 +48,7 @@ public class EventHandler implements AutoCloseable {
 
     private final Map<String, Set<EventSubscriber>> typedEventSubscribers;
     private final Map<String, EventFactory> typedEventFactories;
+    private final Map<EventSubscriber, PathMatcher> eventSubscriberTopicFilters;
 
     private final ScheduledExecutorService watcher = Executors
             .newSingleThreadScheduledExecutor(new NamedThreadFactory("eventwatcher"));
@@ -58,9 +61,11 @@ public class EventHandler implements AutoCloseable {
      * @param typedEventFactories the event factories indexed by the event type
      */
     public EventHandler(final Map<String, Set<EventSubscriber>> typedEventSubscribers,
-            final Map<String, EventFactory> typedEventFactories) {
+            final Map<String, EventFactory> typedEventFactories,
+            final Map<EventSubscriber, PathMatcher> eventSubscriberTopicFilters) {
         this.typedEventSubscribers = typedEventSubscribers;
         this.typedEventFactories = typedEventFactories;
+        this.eventSubscriberTopicFilters = eventSubscriberTopicFilters;
     }
 
     @Override
@@ -139,6 +144,12 @@ public class EventHandler implements AutoCloseable {
 
     private synchronized void dispatchEvent(final Set<EventSubscriber> eventSubscribers, final Event event) {
         for (final EventSubscriber eventSubscriber : eventSubscribers) {
+            PathMatcher topicFilter = eventSubscriberTopicFilters.get(eventSubscriber);
+            if (topicFilter != null && !topicFilter.matches(Paths.get(event.getTopic()))) {
+                logger.trace("Skip event subscriber ({}) because of its topic filter.", eventSubscriber.getClass());
+                return;
+            }
+
             EventFilter filter = eventSubscriber.getEventFilter();
             if (filter == null || filter.apply(event)) {
                 logger.trace("Delegate event to subscriber ({}).", eventSubscriber.getClass());

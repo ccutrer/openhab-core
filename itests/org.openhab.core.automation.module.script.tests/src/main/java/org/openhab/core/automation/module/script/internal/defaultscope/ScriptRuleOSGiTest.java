@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.openhab.core.automation.Action;
 import org.openhab.core.automation.Condition;
@@ -33,7 +32,6 @@ import org.openhab.core.automation.RuleStatusInfo;
 import org.openhab.core.automation.Trigger;
 import org.openhab.core.common.registry.ProviderChangeListener;
 import org.openhab.core.events.Event;
-import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.events.EventSubscriber;
 import org.openhab.core.items.Item;
@@ -93,11 +91,6 @@ public class ScriptRuleOSGiTest extends JavaOSGiTest {
             public Set<String> getSubscribedEventTypes() {
                 return Set.of(ItemCommandEvent.TYPE);
             }
-
-            @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
-            }
         };
         registerService(eventSubscriber);
     }
@@ -125,7 +118,7 @@ public class ScriptRuleOSGiTest extends JavaOSGiTest {
                 .findFirst();
         assertThat(trigger.isPresent(), is(true));
         assertThat(trigger.get().getTypeUID(), is("core.GenericEventTrigger"));
-        assertThat(trigger.get().getConfiguration().get("eventSource"), is("MyTrigger"));
+        assertThat(trigger.get().getConfiguration().get("eventSource"), is(""));
         assertThat(trigger.get().getConfiguration().get("eventTopic"), is("openhab/items/MyTrigger/state"));
         assertThat(trigger.get().getConfiguration().get("eventTypes"), is("ItemStateEvent"));
         Optional<? extends Condition> condition1 = rule.getConditions().stream()

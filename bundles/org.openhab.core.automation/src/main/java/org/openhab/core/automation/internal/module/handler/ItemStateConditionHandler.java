@@ -23,11 +23,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.core.automation.Condition;
 import org.openhab.core.automation.handler.BaseConditionModuleHandler;
 import org.openhab.core.events.Event;
-import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventSubscriber;
 import org.openhab.core.i18n.TimeZoneProvider;
 import org.openhab.core.items.Item;
@@ -54,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * @author Kai Kreuzer - refactored and simplified customized module handling
  */
 @NonNullByDefault
-public class ItemStateConditionHandler extends BaseConditionModuleHandler implements EventSubscriber, EventFilter {
+public class ItemStateConditionHandler extends BaseConditionModuleHandler implements EventSubscriber {
 
     /**
      * Constants for Config-Parameters corresponding to Definition in ItemModuleTypeDefinition.json
@@ -86,7 +84,7 @@ public class ItemStateConditionHandler extends BaseConditionModuleHandler implem
         this.ruleUID = ruleUID;
 
         Dictionary<String, Object> properties = new Hashtable<>();
-        properties.put("event.topics", "openhab/items/" + itemName + "/*");
+        properties.put(EventSubscriber.EVENT_TOPICS_PROPERTY, "openhab/items/" + itemName + "/{added,removed}");
         eventSubscriberRegistration = this.bundleContext.registerService(EventSubscriber.class.getName(), this,
                 properties);
 
@@ -99,11 +97,6 @@ public class ItemStateConditionHandler extends BaseConditionModuleHandler implem
     @Override
     public Set<String> getSubscribedEventTypes() {
         return types;
-    }
-
-    @Override
-    public @Nullable EventFilter getEventFilter() {
-        return this;
     }
 
     @Override
@@ -259,12 +252,6 @@ public class ItemStateConditionHandler extends BaseConditionModuleHandler implem
     public void dispose() {
         super.dispose();
         eventSubscriberRegistration.unregister();
-    }
-
-    @Override
-    public boolean apply(Event event) {
-        logger.trace("->FILTER: {}:{}", event.getTopic(), itemName);
-        return event.getTopic().contains("openhab/items/" + itemName + "/");
     }
 
     private ZonedDateTime getCompareTime(String input) {

@@ -45,7 +45,6 @@ import org.openhab.core.automation.util.RuleBuilder;
 import org.openhab.core.common.registry.ProviderChangeListener;
 import org.openhab.core.config.core.Configuration;
 import org.openhab.core.events.Event;
-import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.events.EventSubscriber;
 import org.openhab.core.items.Item;
@@ -118,11 +117,6 @@ public class RuntimeRuleTest extends JavaOSGiTest {
             public Set<String> getSubscribedEventTypes() {
                 return Set.of(eventType);
             }
-
-            @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
-            }
         };
 
         ServiceReference<?> subscriberReference = registerService(eventSubscriber).getReference();
@@ -148,8 +142,8 @@ public class RuntimeRuleTest extends JavaOSGiTest {
 
     @Test
     public void itemStateUpdatedBySimpleRule() throws ItemNotFoundException, InterruptedException {
-        final Configuration triggerConfig = new Configuration(Map.ofEntries(entry("eventSource", "myMotionItem2"),
-                entry("eventTopic", "openhab/*"), entry("eventTypes", "ItemStateEvent")));
+        final Configuration triggerConfig = new Configuration(Map.ofEntries(
+                entry("eventTopic", "openhab/items/myMotionItem2/state"), entry("eventTypes", "ItemStateEvent")));
         final Configuration actionConfig = new Configuration(
                 Map.ofEntries(entry("itemName", "myLampItem2"), entry("command", "ON")));
         final Rule rule = RuleBuilder.create("myRule21" + new Random().nextInt())

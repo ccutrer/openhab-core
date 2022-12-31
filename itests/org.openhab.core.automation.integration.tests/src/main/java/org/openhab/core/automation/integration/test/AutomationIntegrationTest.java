@@ -65,7 +65,6 @@ import org.openhab.core.config.core.ConfigDescriptionParameter;
 import org.openhab.core.config.core.ConfigDescriptionParameterBuilder;
 import org.openhab.core.config.core.Configuration;
 import org.openhab.core.events.Event;
-import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.events.EventSubscriber;
 import org.openhab.core.items.Item;
@@ -198,11 +197,6 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
             }
 
             @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
-            }
-
-            @Override
             public void receive(Event e) {
                 logger.info("RuleEvent: {}", e.getTopic());
                 ruleEvent = e;
@@ -260,8 +254,7 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
     public void assertThatARuleWithConnectionsIsExecuted() {
         logger.info("assert that a rule with connections is executed");
         Map<String, Object> params = new HashMap<>();
-        params.put("eventSource", "myMotionItem3");
-        params.put("eventTopic", "openhab/*");
+        params.put("eventTopic", "openhab/items/myMotionItem3/state");
         params.put("eventTypes", "ItemStateEvent");
         Configuration triggerConfig = new Configuration(params);
         params = new HashMap<>();
@@ -296,11 +289,6 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
             @Override
             public Set<String> getSubscribedEventTypes() {
                 return Set.of(RuleStatusInfoEvent.TYPE);
-            }
-
-            @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
             }
 
             @Override
@@ -396,11 +384,6 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
             }
 
             @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
-            }
-
-            @Override
             public void receive(Event e) {
                 logger.info("Event: {}", e.getTopic());
                 if (e.getTopic().contains("myLampItem3")) {
@@ -461,11 +444,6 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
             }
 
             @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
-            }
-
-            @Override
             public void receive(Event e) {
                 logger.info("Event: {}", e.getTopic());
                 if (e.getTopic().contains("myLampItem3")) {
@@ -513,11 +491,6 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
             @Override
             public Set<String> getSubscribedEventTypes() {
                 return Set.of(ItemCommandEvent.TYPE);
-            }
-
-            @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
             }
 
             @Override
@@ -597,11 +570,6 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
             }
 
             @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
-            }
-
-            @Override
             public void receive(Event e) {
                 logger.info("Event: {}", e.getTopic());
                 if (e.getTopic().contains("myLampItem4")) {
@@ -625,8 +593,7 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
         logger.info("assert a rule added by api is executed as expected");
         // Creation of RULE
         Map<String, Object> params = new HashMap<>();
-        params.put("eventSource", "myMotionItem2");
-        params.put("eventTopic", "openhab/*");
+        params.put("eventTopic", "openhab/items/myMotionItem2/state");
         params.put("eventTypes", "ItemStateEvent");
         Configuration triggerConfig = new Configuration(params);
         params = new HashMap<>();
@@ -710,11 +677,6 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
             }
 
             @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
-            }
-
-            @Override
             public void receive(Event e) {
                 logger.info("Event: {}", e.getTopic());
                 if (e.getTopic().contains("templ_LampItem")) {
@@ -766,11 +728,6 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
             @Override
             public Set<String> getSubscribedEventTypes() {
                 return Set.of(ItemCommandEvent.TYPE);
-            }
-
-            @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
             }
 
             @Override
@@ -895,8 +852,7 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
         int rand = new Random().nextInt();
 
         Map<String, Object> configs = new HashMap<>();
-        configs.put("eventSource", "myMotionItem2");
-        configs.put("eventTopic", "openhab/*");
+        configs.put("eventTopic", "openhab/items/myMotionItem2/state");
         configs.put("eventTypes", "ItemStateEvent");
         Configuration triggerConfig = new Configuration(configs);
         configs = new HashMap<>();
@@ -921,8 +877,7 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
         logger.info("assert a rule with generic condition works");
         // Creation of RULE
         Map<String, Object> configs = new HashMap<>();
-        configs.put("eventSource", "myMotionItem5");
-        configs.put("eventTopic", "openhab/*");
+        configs.put("eventTopic", "openhab/items/myMotionItem5/state");
         configs.put("eventTypes", "ItemStateEvent");
         Configuration triggerConfig = new Configuration(configs);
         configs = new HashMap<>();
@@ -981,11 +936,6 @@ public class AutomationIntegrationTest extends JavaOSGiTest {
             @Override
             public Set<String> getSubscribedEventTypes() {
                 return Set.of(ItemCommandEvent.TYPE);
-            }
-
-            @Override
-            public @Nullable EventFilter getEventFilter() {
-                return null;
             }
 
             @Override

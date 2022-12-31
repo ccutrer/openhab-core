@@ -64,7 +64,7 @@ public class ChannelEventTriggerHandler extends BaseTriggerModuleHandler impleme
         this.bundleContext = bundleContext;
 
         Dictionary<String, Object> properties = new Hashtable<>();
-        properties.put("event.topics", TOPIC);
+        properties.put(EventSubscriber.EVENT_TOPICS_PROPERTY, TOPIC);
         eventSubscriberRegistration = this.bundleContext.registerService(EventSubscriber.class.getName(), this,
                 properties);
     }

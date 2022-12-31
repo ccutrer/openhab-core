@@ -326,14 +326,12 @@ public class ItemStateConditionHandlerTest extends JavaTest {
 
         // added later
         ItemAddedEvent addedEvent = ItemEventFactory.createAddedEvent(new SwitchItem(ITEM_NAME));
-        assertTrue(handler.apply(addedEvent));
         handler.receive(addedEvent);
         assertLogMessage(ItemStateConditionHandler.class, LogLevel.INFO,
                 "Item 'myItem' needed for rule 'foo' added. Condition 'conditionId' will now work.");
 
         // removed later
         ItemRemovedEvent removedEvent = ItemEventFactory.createRemovedEvent(new SwitchItem(ITEM_NAME));
-        assertTrue(handler.apply(removedEvent));
         handler.receive(removedEvent);
         assertLogMessage(ItemStateConditionHandler.class, LogLevel.WARN,
                 "Item 'myItem' needed for rule 'foo' removed. Condition 'conditionId' will no longer work.");

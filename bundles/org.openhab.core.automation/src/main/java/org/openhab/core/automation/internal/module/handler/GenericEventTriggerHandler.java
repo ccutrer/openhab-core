@@ -56,7 +56,6 @@ public class GenericEventTriggerHandler extends BaseTriggerModuleHandler impleme
     private final Logger logger = LoggerFactory.getLogger(GenericEventTriggerHandler.class);
 
     private final String source;
-    private String topic;
     private final Set<String> types;
     private final BundleContext bundleContext;
 
@@ -64,8 +63,9 @@ public class GenericEventTriggerHandler extends BaseTriggerModuleHandler impleme
 
     public GenericEventTriggerHandler(Trigger module, BundleContext bundleContext) {
         super(module);
-        this.source = (String) module.getConfiguration().get(CFG_EVENT_SOURCE);
-        this.topic = (String) module.getConfiguration().get(CFG_EVENT_TOPIC);
+        this.source = ((String) module.getConfiguration().get(CFG_EVENT_SOURCE)).trim();
+        String topic = ((String) module.getConfiguration().get(CFG_EVENT_TOPIC)).trim();
+
         if (module.getConfiguration().get(CFG_EVENT_TYPES) != null) {
             this.types = Set.of(((String) module.getConfiguration().get(CFG_EVENT_TYPES)).split(","));
         } else {
@@ -73,7 +73,9 @@ public class GenericEventTriggerHandler extends BaseTriggerModuleHandler impleme
         }
         this.bundleContext = bundleContext;
         Dictionary<String, Object> properties = new Hashtable<>();
-        properties.put("event.topics", topic);
+        if (!topic.isEmpty()) {
+            properties.put(EventSubscriber.EVENT_TOPICS_PROPERTY, topic);
+        }
         eventSubscriberRegistration = this.bundleContext.registerService(EventSubscriber.class.getName(), this,
                 properties);
         logger.trace("Registered EventSubscriber: Topic: {} Type: {} Source: {}", topic, types, source);
@@ -106,21 +108,6 @@ public class GenericEventTriggerHandler extends BaseTriggerModuleHandler impleme
     }
 
     /**
-     * @return the topic
-     */
-    public String getTopic() {
-        return topic;
-    }
-
-    /**
-     * @param topic
-     *            the topic to set
-     */
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    /**
      * do the cleanup: unregistering eventSubscriber...
      */
     @Override
@@ -134,7 +121,11 @@ public class GenericEventTriggerHandler extends BaseTriggerModuleHandler impleme
 
     @Override
     public boolean apply(Event event) {
-        logger.trace("->FILTER: {}:{}", event.getTopic(), source);
-        return event.getTopic().contains(source);
+        String eventSource = event.getSource();
+        logger.trace("->FILTER: {}:{}", eventSource, source);
+        if (!source.isEmpty()) {
+            return eventSource != null && eventSource.equals(source);
+        }
+        return true;
     }
 }
